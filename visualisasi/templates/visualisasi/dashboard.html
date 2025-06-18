@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Visualisasi Saham</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 20px;}
+        .chart-container { width: 80%; max-width: 1200px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { text-align: center; color: #444; }
+        .filter-form { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 10px; 
+            margin-bottom: 40px; 
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .filter-form select, .filter-form button {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        .filter-form button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        .filter-form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dashboard Harga & Volume Saham</h1>
+
+    <form class="filter-form" method="GET">
+        <label for="tahun-select">Pilih Tahun:</label>
+        <select name="tahun" id="tahun-select">
+            <option value="">Semua Tahun</option>
+            {% for year in all_years %}
+                <option value="{{ year }}" {% if year == selected_tahun %}selected{% endif %}>
+                    {{ year }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+    <div class="chart-container">
+        <h2>Grafik Harga Penutupan</h2>
+        <canvas id="hargaSahamChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Grafik Volume Transaksi</h2>
+        <canvas id="volumeSahamChart"></canvas>
+    </div>
+
+    <script>
+        // Data dari Django View
+        const labels = {{ labels|safe }};
+        const dataHargaPenutupan = {{ data_harga_penutupan|safe }};
+        const dataVolume = {{ data_volume|safe }};
+
+        // Konfigurasi Grafik Harga (Line Chart)
+        const configHarga = {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Harga Penutupan Saham (IHSG)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    data: dataHargaPenutupan,
+                    fill: true,
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: false } } }
+        };
+        new Chart(document.getElementById('hargaSahamChart'), configHarga);
+
+        // Konfigurasi Grafik Volume (Bar Chart)
+        const configVolume = {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Volume Transaksi',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: dataVolume,
+                }]
+            },
+            options: { responsive: true, scales: { y: { ticks: {
+                callback: function(value) {
+                    if (value >= 1e9) return (value / 1e9).toFixed(1) + 'B';
+                    if (value >= 1e6) return (value / 1e6).toFixed(1) + 'M';
+                    if (value >= 1e3) return (value / 1e3) + 'K';
+                    return value;
+                }
+            }}}}
+        };
+        new Chart(document.getElementById('volumeSahamChart'), configVolume);
+    </script>
+</body>
+</html>

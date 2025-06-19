@@ -1,5 +1,5 @@
 ## Afiliasi
 
-Proyek mata kuliah Business Intelligence ini diselesaikan sebagai bagian dari tugas akhir Prodi Sistem Informasi di Universitas Negeri Surabaya (UNESA).
+Proyek mata kuliah Business Intelligence ini diselesaikan sebagai bagian dari tugas akhir  peminatan Knowledge Data Discovery Prodi Sistem Informasidi Universitas Negeri Surabaya (UNESA).
 
 ---
